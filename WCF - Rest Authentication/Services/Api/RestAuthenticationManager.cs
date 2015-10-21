@@ -13,8 +13,6 @@ namespace WcfRestAuthentication.Services.Api
     {
         private readonly IAuthenticationProvider _authenticationProvider;
 
-        public RestAuthenticationManager() { }
-
         public RestAuthenticationManager(IAuthenticationProvider authenticationProvider)
         {
             _authenticationProvider = authenticationProvider;

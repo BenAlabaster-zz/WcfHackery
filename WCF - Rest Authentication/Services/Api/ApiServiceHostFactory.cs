@@ -15,8 +15,8 @@ namespace WcfRestAuthentication.Services.Api
         private ServiceAuthenticationManager AuthenticationManager { get; set; }
         private ServiceAuthorizationManager AuthorizationManager { get; set; }
 
-        public ApiServiceHostFactory(IUserRepository userRepository, IProductRepository productRepository,
-            IConfigurationProvider configurationProvider, ServiceAuthenticationManager authenticationManager, ServiceAuthorizationManager authorizationManager)
+        public ApiServiceHostFactory(IConfigurationProvider configurationProvider, IUserRepository userRepository, IProductRepository productRepository, 
+            ServiceAuthenticationManager authenticationManager, ServiceAuthorizationManager authorizationManager)
         {
             UserRepository = userRepository;
             ProductRepository = productRepository;

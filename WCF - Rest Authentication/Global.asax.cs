@@ -29,14 +29,14 @@ namespace WcfRestAuthentication
             UserRepository = new MyFakeUserRepository();
             ProductRepository = new MyFakeProductRepository();
             ConfigurationProvider = new MyConfigurationProvider();
-            AuthenticationManager = new ServiceAuthenticationManager();
-            AuthorizationManager = new ServiceAuthorizationManager();
+            AuthenticationManager = new RestAuthenticationManager();
+            AuthorizationManager = new RestAuthorizationManager();
         }
 
         private void MapRoutes(RouteCollection routes)
         {
-            routes.Add(new ServiceRoute("api", 
-                new ApiServiceHostFactory(UserRepository, ProductRepository, ConfigurationProvider, AuthenticationManager, AuthorizationManager), 
+            routes.Add(new ServiceRoute("api",
+                new ApiServiceHostFactory(ConfigurationProvider, UserRepository, ProductRepository, AuthenticationManager, AuthorizationManager), 
                     typeof(ApiService)));
         }
     }
