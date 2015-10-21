@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IdentityModel.Policy;
-using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading;
 using System.Web;
+using WcfRestAuthentication.Authentication;
 
 namespace WcfRestAuthentication.Services.Api
 {
     public class RestAuthenticationManager : ServiceAuthenticationManager
     {
+        private readonly IAuthenticationProvider _authenticationProvider;
+
+        public RestAuthenticationManager() { }
+
+        public RestAuthenticationManager(IAuthenticationProvider authenticationProvider)
+        {
+            _authenticationProvider = authenticationProvider;
+        }
+
         public override ReadOnlyCollection<IAuthorizationPolicy> Authenticate(ReadOnlyCollection<IAuthorizationPolicy> authPolicy, Uri listenUri, ref Message message)
         {
             var requestProperties =
@@ -17,17 +27,14 @@ namespace WcfRestAuthentication.Services.Api
 
             var rawAuthHeader = requestProperties.Headers["Authorization"];
 
-            AuthenticationHeader authHeader = null;
-            if (AuthenticationHeader.TryDecode(rawAuthHeader, out authHeader)) ;
+            BasicAuthenticationHeaderTranslator authHeader = null;
+
+            //Secure by default... if no authentication provider is configured, no entry.
+            if (_authenticationProvider != null && BasicAuthenticationHeaderTranslator.TryDecode(rawAuthHeader, out authHeader)) ;
             {
-                var identity = new GenericIdentity(authHeader.Username);
-                var principal = new GenericPrincipal(identity, new string[] { });
+                Thread.CurrentPrincipal = _authenticationProvider.Authenticate(authHeader.Username, authHeader.Password);
 
-                var httpContext = new HttpContextWrapper(HttpContext.Current)
-                {
-                    User = principal,
-                };
-
+                var httpContext = new HttpContextWrapper(HttpContext.Current) { User = Thread.CurrentPrincipal };
                 if (httpContext.User != null)
                     return authPolicy;
             }
@@ -41,7 +48,12 @@ namespace WcfRestAuthentication.Services.Api
         {
             HttpContext.Current.Response.StatusCode = 401;
             HttpContext.Current.Response.StatusDescription = "Unauthorized";
-            HttpContext.Current.Response.Headers.Add("WWW-Authenticate", string.Format("{0} realm=\"{1}\"", "Basic", "site"));
+
+            foreach (var header in _authenticationProvider.GetUnauthenticatedHttpHeaders())
+            {
+                HttpContext.Current.Response.Headers.Add(header.Key, header.Value);
+            }
+
             HttpContext.Current.Response.End();
         }
     }

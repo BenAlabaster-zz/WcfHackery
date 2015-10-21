@@ -8,13 +8,10 @@ namespace WcfRestAuthentication.Model
     {
         [DataMember]
         public Guid Id { get; protected set; }
-
         [DataMember]
         public Guid Category { get; set; }
-
         [DataMember]
         public string Name { get; set; }
-
         [DataMember]
         public string Description { get; set; }
 

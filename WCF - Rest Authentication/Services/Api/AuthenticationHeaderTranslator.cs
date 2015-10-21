@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace WcfRestAuthentication.Services.Api
 {
-    internal class AuthenticationHeader
+    internal class BasicAuthenticationHeaderTranslator
     {
         public string AuthenticationType { get; protected set; }
         public string Username { get; protected set; }
@@ -18,14 +18,14 @@ namespace WcfRestAuthentication.Services.Api
                 EncodeCredentials(Username, Password));
         }
 
-        public AuthenticationHeader(string authenticationType, string username, string password)
+        public BasicAuthenticationHeaderTranslator(string authenticationType, string username, string password)
         {
             AuthenticationType = authenticationType;
             Username = username;
             Password = password;
         }
 
-        private AuthenticationHeader(string httpHeader)
+        private BasicAuthenticationHeaderTranslator(string httpHeader)
         {
             const RegexOptions regexOpts = RegexOptions.Compiled | RegexOptions.IgnoreCase;
             var match = Regex.Match(httpHeader, @"^(.*?)\s+?(.*)$", regexOpts);
@@ -46,15 +46,15 @@ namespace WcfRestAuthentication.Services.Api
             return Convert.ToBase64String(bytes);
         }
 
-        public static AuthenticationHeader Decode(string httpHeader)
+        public static BasicAuthenticationHeaderTranslator Decode(string httpHeader)
         {
             if (string.IsNullOrWhiteSpace(httpHeader))
                 return null;
 
-            return new AuthenticationHeader(httpHeader);
+            return new BasicAuthenticationHeaderTranslator(httpHeader);
         }
 
-        public static bool TryDecode(string httpHeader, out AuthenticationHeader decoded)
+        public static bool TryDecode(string httpHeader, out BasicAuthenticationHeaderTranslator decoded)
         {
             decoded = null;
             if (string.IsNullOrWhiteSpace(httpHeader))
@@ -62,7 +62,7 @@ namespace WcfRestAuthentication.Services.Api
 
             try
             {
-                decoded = new AuthenticationHeader(httpHeader);
+                decoded = new BasicAuthenticationHeaderTranslator(httpHeader);
                 return true;
             }
             catch

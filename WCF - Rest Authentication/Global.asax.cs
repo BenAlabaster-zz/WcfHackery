@@ -1,22 +1,43 @@
 ﻿using System;
+using System.ServiceModel;
 using System.Web.Routing;
 using System.ServiceModel.Activation;
+using WcfRestAuthentication.Authentication;
+using WcfRestAuthentication.Data;
 using WcfRestAuthentication.Services.Api;
 
 namespace WcfRestAuthentication
 {
     public class Global : System.Web.HttpApplication
     {
+        private IUserRepository UserRepository { get; set; }
+        private IProductRepository ProductRepository { get; set; }
+        private IConfigurationProvider ConfigurationProvider { get; set; }
+        private ServiceAuthenticationManager AuthenticationManager { get; set; }
+        private ServiceAuthorizationManager AuthorizationManager { get; set; }
 
         protected void Application_Start(object sender, EventArgs e)
         {
+            ConfigureDependencies();
             MapRoutes(RouteTable.Routes);
 
         }
 
+        private void ConfigureDependencies()
+        {
+            //ToDo: Push these into Castle Windsor
+            UserRepository = new MyFakeUserRepository();
+            ProductRepository = new MyFakeProductRepository();
+            ConfigurationProvider = new MyConfigurationProvider();
+            AuthenticationManager = new ServiceAuthenticationManager();
+            AuthorizationManager = new ServiceAuthorizationManager();
+        }
+
         private void MapRoutes(RouteCollection routes)
         {
-            routes.Add(new ServiceRoute("api", new ServiceHostFactory(), typeof(ApiService)));
+            routes.Add(new ServiceRoute("api", 
+                new ApiServiceHostFactory(UserRepository, ProductRepository, ConfigurationProvider, AuthenticationManager, AuthorizationManager), 
+                    typeof(ApiService)));
         }
     }
 }

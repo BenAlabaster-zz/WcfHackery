@@ -23,7 +23,7 @@ namespace WcfRestAuthentication.Services.Api.Endpoints.User
 
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{UserId}"), UriTemplateSafe]
-        void Delete(Guid userId);
+        void DeleteUser(Guid userId);
 
     }
 }

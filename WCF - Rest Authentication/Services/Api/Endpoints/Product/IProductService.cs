@@ -28,6 +28,6 @@ namespace WcfRestAuthentication.Services.Api.Endpoints.Product
         
         [OperationContract]
         [WebInvoke(Method = "DELETE", UriTemplate = "/{productId}"), UriTemplateSafe]
-        void Delete(Guid productId);
+        void DeleteProduct(Guid productId);
     }
 }

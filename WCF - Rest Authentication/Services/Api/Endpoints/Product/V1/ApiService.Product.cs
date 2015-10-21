@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Permissions;
 using WcfRestAuthentication.Model;
 using WcfRestAuthentication.Services.Api.Endpoints.Product;
 
@@ -20,19 +21,28 @@ namespace WcfRestAuthentication.Services.Api
             };
         }
 
+        [PrincipalPermission(SecurityAction.Demand, Role = "Contributor")]
         public Product Put(Product product)
         {
-            throw new NotImplementedException();
+            return ProductRepository.Update(product);
         }
 
+        [PrincipalPermission(SecurityAction.Demand, Role = "User")]
         Product IProductService.Get(Guid productId)
         {
-            throw new NotImplementedException();
+            return ProductRepository.Get(productId);
         }
 
+        [PrincipalPermission(SecurityAction.Demand, Role = "Contributor")]
         public Product Post(Product product)
         {
-            throw new NotImplementedException();
+            return ProductRepository.Update(product);
+        }
+
+        [PrincipalPermission(SecurityAction.Demand, Role = "Administrator")]
+        public void DeleteProduct(Guid productId)
+        {
+            ProductRepository.Delete(productId);
         }
     }
 }
